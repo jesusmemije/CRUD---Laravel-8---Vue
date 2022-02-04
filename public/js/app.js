@@ -5347,12 +5347,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       articulo: {
-        nombre: 'Jesús',
-        descripcion: 'Nothing for the moment',
+        nombre: '',
+        descripcion: '',
         stock: 1
       },
       id: 0,
@@ -5360,7 +5383,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       modal: 0,
       tituloModal: '',
       articulos: [],
-      errores: {}
+      errores: {},
+      pagination: {
+        page: 1,
+        per_page: 5
+      },
+      paginas: []
     };
   },
   methods: {
@@ -5374,19 +5402,44 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return axios.get('/articulos');
+                return axios.get('/articulos', {
+                  params: _this.pagination
+                });
 
               case 2:
                 res = _context.sent;
                 _this.articulos = res.data;
 
-              case 4:
+                _this.listarPaginas();
+
+              case 5:
               case "end":
                 return _context.stop();
             }
           }
         }, _callee);
       }))();
+    },
+    listarPaginas: function listarPaginas() {
+      var n = 2;
+      var arrayN = [];
+      var ini = this.pagination.page - 2;
+
+      if (ini < 1) {
+        ini = 1;
+      }
+
+      var fin = this.pagination.page + 2;
+
+      if (fin > this.articulos.last_page) {
+        fin = this.articulos.last_page;
+      }
+
+      for (var i = ini; i <= fin; i++) {
+        arrayN.push(i);
+      }
+
+      this.paginas = arrayN;
     },
     eliminar: function eliminar(id) {
       var _this2 = this;
@@ -5489,6 +5542,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     cerrarModal: function cerrarModal() {
       this.modal = 0;
+      this.errores = {};
     }
   },
   created: function created() {
@@ -29506,7 +29560,7 @@ var render = function () {
       _vm._v(" "),
       _c(
         "tbody",
-        _vm._l(_vm.articulos, function (articulo) {
+        _vm._l(_vm.articulos.data, function (articulo) {
           return _c("tr", { key: articulo.id }, [
             _c("th", { attrs: { scope: "row" } }, [
               _vm._v(_vm._s(articulo.id)),
@@ -29552,6 +29606,205 @@ var render = function () {
         }),
         0
       ),
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-4 md-4" }, [
+        _c("span", { staticClass: "text-primary" }, [
+          _vm._v(
+            "Registros del " +
+              _vm._s(_vm.articulos.from) +
+              " al " +
+              _vm._s(_vm.articulos.to) +
+              " de un total de " +
+              _vm._s(_vm.articulos.total)
+          ),
+        ]),
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-2 md-2" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.pagination.per_page,
+                expression: "pagination.per_page",
+              },
+            ],
+            staticClass: "form-control",
+            on: {
+              change: [
+                function ($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function (o) {
+                      return o.selected
+                    })
+                    .map(function (o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.$set(
+                    _vm.pagination,
+                    "per_page",
+                    $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                  )
+                },
+                function ($event) {
+                  return _vm.listar()
+                },
+              ],
+            },
+          },
+          [
+            _c("option", { attrs: { value: "3" } }, [_vm._v("3")]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "5" } }, [_vm._v("5")]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "8" } }, [_vm._v("8")]),
+          ]
+        ),
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-6 md-6" }, [
+        _c("nav", [
+          _c(
+            "ul",
+            { staticClass: "pagination" },
+            [
+              _c(
+                "li",
+                {
+                  staticClass: "page-item",
+                  class: { disabled: _vm.pagination.page == 1 },
+                },
+                [
+                  _c(
+                    "a",
+                    {
+                      staticClass: "page-link",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function ($event) {
+                          _vm.pagination.page = 1
+                          _vm.listar()
+                        },
+                      },
+                    },
+                    [_vm._v("«")]
+                  ),
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "li",
+                {
+                  staticClass: "page-item",
+                  class: { disabled: _vm.pagination.page == 1 },
+                },
+                [
+                  _c(
+                    "a",
+                    {
+                      staticClass: "page-link",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function ($event) {
+                          _vm.pagination.page--
+                          _vm.listar()
+                        },
+                      },
+                    },
+                    [_vm._v("<")]
+                  ),
+                ]
+              ),
+              _vm._v(" "),
+              _vm._l(_vm.paginas, function (n) {
+                return _c(
+                  "li",
+                  {
+                    key: n,
+                    staticClass: "page-item",
+                    class: { active: _vm.pagination.page == n },
+                  },
+                  [
+                    _c(
+                      "a",
+                      {
+                        staticClass: "page-link",
+                        attrs: { href: "#" },
+                        on: {
+                          click: function ($event) {
+                            _vm.pagination.page = n
+                            _vm.listar()
+                          },
+                        },
+                      },
+                      [_vm._v(_vm._s(n))]
+                    ),
+                  ]
+                )
+              }),
+              _vm._v(" "),
+              _c(
+                "li",
+                {
+                  staticClass: "page-item",
+                  class: {
+                    disabled: _vm.pagination.page == _vm.articulos.last_page,
+                  },
+                },
+                [
+                  _c(
+                    "a",
+                    {
+                      staticClass: "page-link",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function ($event) {
+                          _vm.pagination.page++
+                          _vm.listar()
+                        },
+                      },
+                    },
+                    [_vm._v(">")]
+                  ),
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "li",
+                {
+                  staticClass: "page-item",
+                  class: {
+                    disabled: _vm.pagination.page == _vm.articulos.last_page,
+                  },
+                },
+                [
+                  _c(
+                    "a",
+                    {
+                      staticClass: "page-link",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function ($event) {
+                          _vm.pagination.page = _vm.articulos.last_page
+                          _vm.listar()
+                        },
+                      },
+                    },
+                    [_vm._v("»")]
+                  ),
+                ]
+              ),
+            ],
+            2
+          ),
+        ]),
+      ]),
     ]),
   ])
 }

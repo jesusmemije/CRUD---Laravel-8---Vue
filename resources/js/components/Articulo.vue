@@ -52,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="articulo in articulos" :key="articulo.id">
+        <tr v-for="articulo in articulos.data" :key="articulo.id">
           <th scope="row">{{ articulo.id }}</th>
           <td>{{ articulo.nombre }}</td>
           <td>{{ articulo.descripcion }}</td>
@@ -62,6 +62,29 @@
         </tr>
       </tbody>
     </table>
+    <div class="row">
+        <div class="col-4 md-4">
+            <span class="text-primary">Registros del {{ articulos.from }} al {{ articulos.to }} de un total de {{ articulos.total }}</span>
+        </div>
+        <div class="col-2 md-2">
+            <select class="form-control" v-model="pagination.per_page" @change="listar()">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="8">8</option>
+            </select>
+        </div>
+        <div class="col-6 md-6">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item" :class="{ disabled : pagination.page == 1 }"><a href="#" class="page-link" @click="pagination.page = 1; listar()">&laquo;</a></li>
+                    <li class="page-item" :class="{ disabled : pagination.page == 1 }"><a href="#" class="page-link" @click="pagination.page --; listar()">&lt;</a></li>
+                    <li class="page-item" v-for="n in paginas" :key="n" :class="{ active : pagination.page == n }"><a href="#" class="page-link" @click="pagination.page = n; listar()">{{ n }}</a></li>
+                    <li class="page-item" :class="{ disabled : pagination.page == articulos.last_page }"><a href="#" class="page-link" @click="pagination.page ++; listar()">&gt;</a></li>
+                    <li class="page-item" :class="{ disabled : pagination.page == articulos.last_page }"><a href="#" class="page-link" @click="pagination.page = articulos.last_page; listar()">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
   </div>
 </template>
 <script>
@@ -69,8 +92,8 @@ export default {
     data() {
         return {
             articulo : {
-                nombre : 'Jesús',
-                descripcion : 'Nothing for the moment',
+                nombre : '',
+                descripcion : '',
                 stock : 1,
             },
             id : 0,
@@ -79,12 +102,34 @@ export default {
             tituloModal : '',
             articulos : [],
             errores : {},
+            pagination : {
+                page : 1,
+                per_page : 5,
+            },
+            paginas : [],
         }
     },
     methods: {
         async listar () {
-            const res = await axios.get('/articulos');
+            const res = await axios.get('/articulos', {params : this.pagination});
             this.articulos = res.data;
+            this.listarPaginas();
+        },
+        listarPaginas(){
+            const n = 2
+            let arrayN = []
+            let ini = this.pagination.page -2
+            if (ini < 1) {
+                ini = 1
+            }
+            let fin = this.pagination.page +2
+            if (fin > this.articulos.last_page) {
+                fin = this.articulos.last_page
+            }
+            for (let i = ini; i <= fin; i++) {
+                arrayN.push(i)
+            }
+            this.paginas = arrayN
         },
         async eliminar (id) {
             const res = await axios.delete('/articulos/' + id);
@@ -123,6 +168,7 @@ export default {
         },
         cerrarModal (){
             this.modal = 0;
+            this.errores = {};
         },
     },
     created() {
